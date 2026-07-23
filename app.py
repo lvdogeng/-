@@ -28,8 +28,12 @@ BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 MODEL_NAME = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 # 注意：如果 API_KEY 为空，应用仍会启动，但首次对话时会报错
 # （不要在这里 raise，避免整个 app 启动失败导致健康检查永不通过）
-# 用 wrap_openai 包装 OpenAI 客户端 —— 所有 chat.completions 调用会自动生成 LangSmith Trace
+# 用 wrap_openai 包装 OpenAI 客户端 —— 所有 chat.completions调用会自动生成 LangSmith Trace
 llm_client = wrap_openai(OpenAI(api_key=API_KEY, base_url=BASE_URL))
+
+# 独立的 OpenAI 客户端（用于嵌入向量，跳过 LangSmith 包装以避免额外开销）
+_openai_client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+OPENAI_EMBED_MODEL = os.environ.get("OPENAI_EMBED_MODEL", "text-embedding-3-small")
 
 _PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 _CHROMA_DIR = os.path.join(_PROJECT_DIR, "chroma_db")
@@ -150,21 +154,28 @@ _kb_ready = False      # 标记 KB 是否已初始化（非阻塞）
 _kb_embed_model = None  # BGE 本地嵌入模型，用于查询编码
 
 def _get_embedding(text):
-    """使用本地 BGE 模型计算文本嵌入向量，避免 ChromaDB 下载 ONNX"""
-    global _kb_embed_model
-    if _kb_embed_model is None:
-        try:
-            from sentence_transformers import SentenceTransformer
-            _kb_embed_model = SentenceTransformer(str(_MODEL_DIR))
-        except Exception as e:
-            print(f"  [嵌入模型加载失败] {e}")
-            return None
+    """计算文本嵌入向量，优先使用 OpenAI Embeddings API（云端无模型加载），
+       失败时降级到本地 BGE 模型。"""
+    # 1. 优先: OpenAI Embeddings API（不需要下载 95MB 模型）
     try:
-        vec = _kb_embed_model.encode([text], normalize_embeddings=True)[0].tolist()
-        return vec
+        resp = _openai_client.embeddings.create(model=OPENAI_EMBED_MODEL, input=text)
+        return resp.data[0].embedding
     except Exception as e:
-        print(f"  [编码失败] {e}")
-        return None
+        # 2. 降级: 本地 BGE 模型（首次慢，但可离线用）
+        global _kb_embed_model
+        if _kb_embed_model is None:
+            try:
+                from sentence_transformers import SentenceTransformer
+                _kb_embed_model = SentenceTransformer(str(_MODEL_DIR))
+            except Exception as e2:
+                print(f"  [嵌入模型加载失败] {e2}")
+                return None
+        try:
+            vec = _kb_embed_model.encode([text], normalize_embeddings=True)[0].tolist()
+            return vec
+        except Exception as e2:
+            print(f"  [编码失败] {e2}")
+            return None
 
 # 配置参数
 RERANK_RECALL_K = 10          # 向量+BM25 各取 Top-N 做 RRF 融合
