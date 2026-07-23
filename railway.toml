@@ -1,0 +1,21 @@
+# ════════════════════════════════════════════════════════════
+#  Railway.app — Railway 项目配置
+#  文档: https://docs.railway.app/reference/config-as-code
+# ════════════════════════════════════════════════════════════
+
+[build]
+builder = "NIXPACKS"   # 使用 Railway 内置的 Nixpacks（自动识别 Python）
+# 如果想用 Dockerfile，改为: builder = "DOCKERFILE"
+
+[deploy]
+startCommand = "bash start.sh"
+numReplicas = 1
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+healthcheckPath = "/healthz"
+healthcheckTimeout = 60
+# 等待健康检查通过再对外服务
+waitForSuccess = true
+
+# 部署超时（秒），首次部署要下载依赖和模型，时间宽松一点
+deployTimeout = 900

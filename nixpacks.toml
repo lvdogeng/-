@@ -1,0 +1,20 @@
+# ════════════════════════════════════════════════════════════
+#  Nixpacks 配置 — Railway 自动构建行为
+#  文档: https://nixpacks.com/docs/configuration
+# ════════════════════════════════════════════════════════════
+
+[providers]
+python = "3.11"
+
+[variables]
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+NIXPACKS_PYTHON_VERSION = "3.11"
+
+# 安装系统依赖（chromadb 需要 sqlite3，sentence-transformers 需要 gcc 等）
+[phases.setup]
+nixPkgs = ["...", "gcc", "g++", "cmake", "libsqlite3-dev"]
+
+# 安装阶段 — 用清华镜像加速
+[phases.install]
+cmds = ["pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir"]

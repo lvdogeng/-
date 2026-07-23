@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# 数据库（Railway 默认每次新部署都会清空）
+*.db
+*.sqlite3
+
+# 临时文件
+.env.local
+*.log
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
