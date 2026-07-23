@@ -30,5 +30,4 @@ exec gunicorn wsgi:app \
     --max-requests-jitter 100 \
     --access-logfile - \
     --error-logfile - \
-    --log-level info \
-    --preload
+    --log-level info
