@@ -13,9 +13,10 @@ numReplicas = 1
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 healthcheckPath = "/healthz"
-healthcheckTimeout = 60
-# 等待健康检查通过再对外服务
-waitForSuccess = true
+# 首次启动要下载 BGE 模型（~95MB），放宽到 300 秒
+healthcheckTimeout = 300
+# 不阻塞 — 即使健康检查慢，应用先对外服务（健康检查会在后台继续）
+waitForSuccess = false
 
 # 部署超时（秒），首次部署要下载依赖和模型，时间宽松一点
 deployTimeout = 900
