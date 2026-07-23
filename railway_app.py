@@ -476,7 +476,8 @@ def generate_stream(session_id: str, user_message: str, persona_key: str):
         chars = string.ascii_letters + string.digits + "!@#$%^&*"
         pwd = ''.join(random.choice(chars) for _ in range(ln))
         yield f"data: {json.dumps({'type': 'tool_call', 'tool': f'🔑 generate_password(length={ln})'}, ensure_ascii=False)}\n\n"
-        yield f"data: {json.dumps({'type': 'chunk', 'content': f'🔑 已生成 **{ln}** 位密码：\\n\\n`{pwd}`'}, ensure_ascii=False)}\n\n"
+        _content = f'🔑 已生成 **{ln}** 位密码：\n\n`{pwd}`'
+        yield f"data: {json.dumps({'type': 'chunk', 'content': _content}, ensure_ascii=False)}\n\n"
         yield f"data: {json.dumps({'type': 'done'}, ensure_ascii=False)}\n\n"
         save_msg(session_id, "user", user_message)
         save_msg(session_id, "assistant", f"密码: {pwd}")
