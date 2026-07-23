@@ -1,6 +1,5 @@
 # ════════════════════════════════════════════════════════════
-#  Nixpacks 配置 — Railway 自动构建行为
-#  文档: https://nixpacks.com/docs/configuration
+#  Nixpacks 配置 — 简化版（让 Railway 自动识别 Python）
 # ════════════════════════════════════════════════════════════
 
 [providers]
@@ -11,10 +10,6 @@ PYTHONUNBUFFERED = "1"
 PYTHONDONTWRITEBYTECODE = "1"
 NIXPACKS_PYTHON_VERSION = "3.11"
 
-# 安装系统依赖（chromadb 需要 sqlite3，sentence-transformers 需要 gcc 等）
-[phases.setup]
-nixPkgs = ["...", "gcc", "g++", "cmake", "libsqlite3-dev"]
-
-# 安装阶段 — 用清华镜像加速
+# 用清华 pip 镜像加速（中国到 PyPI 官方源比较慢）
 [phases.install]
-cmds = ["pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir"]
+cmds = ["pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir --upgrade"]
