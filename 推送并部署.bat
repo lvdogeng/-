@@ -1,93 +1,57 @@
 @echo off
 REM ==========================================================
-REM   Push to GitHub (triggers Railway auto-deploy)
-REM   Double-click to run
+REM   Push to GitHub - One click (token pre-configured)
+REM   Double-click to push and trigger Railway deploy
 REM ==========================================================
 
-REM Try to add git from common locations to PATH
-set "FOUND_GIT=0"
-
-if exist "C:\Users\ROG\.workbuddy\vendor\PortableGit\mingw64\bin\git.exe" (
-    set "PATH=C:\Users\ROG\.workbuddy\vendor\PortableGit\mingw64\bin;%PATH%"
-    set "FOUND_GIT=1"
-)
-
-if exist "C:\Program Files\Git\bin\git.exe" (
-    set "PATH=C:\Program Files\Git\bin;%PATH%"
-    set "FOUND_GIT=1"
-)
-
-if exist "C:\Program Files (x86)\Git\bin\git.exe" (
-    set "PATH=C:\Program Files (x86)\Git\bin;%PATH%"
-    set "FOUND_GIT=1"
-)
+REM Add git to PATH from common locations
+if exist "C:\Users\ROG\.workbuddy\vendor\PortableGit\mingw64\bin\git.exe" set "PATH=C:\Users\ROG\.workbuddy\vendor\PortableGit\mingw64\bin;%PATH%"
+if exist "C:\Program Files\Git\bin\git.exe" set "PATH=C:\Program Files\Git\bin;%PATH%"
 
 cd /d "%~dp0"
 
 chcp 65001 >nul
 echo ===============================================
-echo   Yuebai AI - GitHub Push and Railway Deploy
+echo   Yuebai AI - Push to GitHub + Railway Deploy
 echo ===============================================
 echo.
 
-if "%FOUND_GIT%"=="0" (
-    echo [ERROR] Git not found. Please install git first:
-    echo         https://git-scm.com/download/win
-    pause
-    exit /b 1
-)
-
-echo [STEP 1] Try push with cached credentials...
 git push -u origin main
 if %errorlevel% == 0 goto :success
 
-echo.
-echo [Auth needed] GitHub rejected the push.
-echo.
-echo Get a Personal Access Token:
-echo   1. Open  https://github.com/settings/tokens/new
-echo   2. Note: any name like "yuebai-deploy"
-echo   3. Expiration: No expiration
-echo   4. Select scopes: CHECK 'repo' only
-echo   5. Click 'Generate token' (green button)
-echo   6. COPY the token (looks like ghp_xxxxxx)
-echo   7. Paste it below
-echo.
-echo [TIP] In cmd, right-click the mouse to paste
-echo.
+echo [STEP 1] Pushing with token...
 
-set /p GIT_TOKEN=Paste Token and press Enter: 
+git remote set-url origin https://lvdogeng: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@github.com/lvdogeng/-.git
 
-if "%GIT_TOKEN%"=="" (
-    echo Empty token. Aborting.
-    pause
-    exit /b 1
-)
-
-git remote set-url origin https://lvdogeng:%GIT_TOKEN%@github.com/lvdogeng/-.git
 git push -u origin main
 if not %errorlevel% == 0 goto :fail
 
 :success
 echo.
-echo ===============================================
-echo   Push OK! Railway will auto-deploy now.
-echo ===============================================
+echo ============ SUCCESS ============
 echo.
-echo Open Railway dashboard: https://railway.app/dashboard
-echo Then set these env vars in Variables tab:
-echo   DEEPSEEK_API_KEY = sk-8105f2a68d4e4b76b6c3664a53119276
+echo Code pushed to GitHub!
+echo Railway will auto-deploy shortly.
+echo.
+echo Open Railway Dashboard:
+echo   https://railway.app/dashboard
+echo.
+echo Then set Variables:
+echo   DEEPSEEK_API_KEY
 echo   WORKERS = 2
 echo.
+echo After deploy, go to Settings - Generate Domain
+echo to get your URL.
 goto :end
 
 :fail
 echo.
-echo Push failed. Run manually in Git Bash:
-echo   cd /c/Users/ROG/WorkBuddy/2026-07-23-14-47-00/yuebai-deploy/railway
+echo Push failed. Try manual:
+echo   cd /d %~dp0
 echo   git remote set-url origin https://github.com/lvdogeng/-.git
 echo   git push -u origin main
 echo.
 
 :end
+echo.
 pause
