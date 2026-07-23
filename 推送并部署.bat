@@ -1,50 +1,57 @@
 @echo off
 chcp 65001 >nul
-:: ═════════════════════════════════════════
-::  推送到 GitHub + 触发 Railway 部署
-::  运行后会弹出 GitHub 登录窗口
-:: ═════════════════════════════════════════
+REM ==========================================================
+REM   Push to GitHub (triggers Railway auto-deploy)
+REM   Double-click to run
+REM ==========================================================
 cd /d "%~dp0"
 
-echo ═════════════════════════════════════════
-echo   月白 AI → GitHub → Railway 自动部署
-echo ═════════════════════════════════════════
+echo ===============================================
+echo   Yuebai AI - GitHub Push and Railway Deploy
+echo ===============================================
 echo.
-echo [1/2] 推送到 GitHub...
-call git push -u origin main
 
-if errorlevel 1 (
-    echo.
-    echo ╔═══════════════════════════════════════╗
-    echo ║  需要 GitHub 令牌                       ║
-    echo ║                                        ║
-    echo ║  请按以下步骤操作:                      ║
-    echo ║  1. 打开 https://github.com/settings/tokens  ║
-    echo ║  2. 点 Generate new token (classic)     ║
-    echo ║  3. 勾选 repo 权限                      ║
-    echo ║  4. 复制生成的 Token                    ║
-    echo ║                                        ║
-    echo ║  然后在下方输入 Token                    ║
-    echo ╚═══════════════════════════════════════╝
-    echo.
-    set /p GIT_TOKEN=粘贴你的 GitHub Token: 
-    
-    if not "!GIT_TOKEN!"=="" (
-        git remote set-url origin https://lvdogeng:!GIT_TOKEN!@github.com/lvdogeng/-.git
-        git push -u origin main
-    )
-)
+REM Try to push using existing credentials (Windows Credential Manager)
+git push -u origin main
+if %errorlevel% == 0 goto :success
 
 echo.
-if errorlevel 1 (
-    echo ❌ 推送失败，请手动执行:
-    echo    git remote set-url origin https://github.com/lvdogeng/-.git
-    echo    git push -u origin main
-) else (
-    echo ✅ 推送成功！Railway 会自动开始部署...
-    echo.
-    echo [2/2] 去 Railway 控制台查看进度:
-    echo    https://railway.app/dashboard
-)
+echo [Auth needed] GitHub rejected the push.
 echo.
+echo Get a Personal Access Token:
+echo   1. Open https://github.com/settings/tokens
+echo   2. Generate new token (classic)
+echo   3. Check the 'repo' scope
+echo   4. Copy the token
+echo.
+
+set /p GIT_TOKEN=Paste your token here: 
+
+if "%GIT_TOKEN%"=="" goto :fail
+
+git remote set-url origin https://lvdogeng:%GIT_TOKEN%@github.com/lvdogeng/-.git
+git push -u origin main
+if not %errorlevel% == 0 goto :fail
+
+:success
+echo.
+echo ===============================================
+echo   Push OK! Railway will auto-deploy now.
+echo ===============================================
+echo.
+echo Open Railway dashboard: https://railway.app/dashboard
+echo Then set these env vars in Variables tab:
+echo   DEEPSEEK_API_KEY = sk-8105f2a68d4e4b76b6c3664a53119276
+echo   WORKERS = 2
+echo.
+goto :end
+
+:fail
+echo.
+echo Push failed. Try manually:
+echo   git remote set-url origin https://github.com/lvdogeng/-.git
+echo   git push -u origin main
+echo.
+
+:end
 pause
