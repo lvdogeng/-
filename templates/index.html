@@ -383,7 +383,7 @@ body {
   <div class="main-header">
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
     <h1 id="sessionTitle">🌙 睡前故事创作室</h1>
-    <div class="persona-badge" id="personaBadge" onclick="showPersonaModal()">🌙 月白·温柔</div>
+    <div class="persona-badge" id="personaBadge" onclick="showPersonaModal()">🤖 月白·智能</div>
     <div class="header-actions">
       <button onclick="clearChat()" title="清空对话">🗑️</button>
     </div>
@@ -395,8 +395,8 @@ body {
 
   <div class="chat-area" id="chatArea">
     <div class="empty-state" id="emptyState">
-      <div class="greeting">🌙 今晚想听什么故事？</div>
-      <div class="greeting-msg">告诉我一个主题，让我为你编织一段温暖的梦境。</div>
+      <div class="greeting">你好，我是月白 ✨</div>
+      <div class="greeting-msg">想聊天、解梦、听睡前故事，或者让月白帮你查时间/生成密码，都可以告诉我～</div>
       <div class="quick-actions">
         <button onclick="sendQuick('讲一个关于小狐狸摘星星的故事')">🦊 摘星星的小狐狸</button>
         <button onclick="sendQuick('云朵里的花园')">☁️ 云朵里的花园</button>
@@ -561,8 +561,8 @@ async function loadHistory(){
 function showEmptyState(){
   document.getElementById('chatArea').innerHTML=`
     <div class="empty-state" id="emptyState">
-      <div class="greeting">🌙 今晚想听什么故事？</div>
-      <div class="greeting-msg">告诉我一个主题，让我为你编织一段温暖的梦境。</div>
+      <div class="greeting">你好，我是月白 ✨</div>
+      <div class="greeting-msg">想聊天、解梦、听睡前故事，或者让月白帮你查时间/生成密码，都可以告诉我～</div>
       <div class="quick-actions">
         <button onclick="sendQuick('讲一个关于小狐狸摘星星的故事')">🦊 摘星星的小狐狸</button>
         <button onclick="sendQuick('云朵里的花园')">☁️ 云朵里的花园</button>
