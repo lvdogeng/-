@@ -353,7 +353,7 @@ def chat():
         if not msg:
             return json.dumps({"error": "消息不能为空"}), 400
         # 检查 API Key 是否配置
-        if not API_KEY:
+        if not DEEPSEEK_API_KEY:
             return json.dumps({"error": "DEEPSEEK_API_KEY 环境变量未设置,请到 Railway Variables 配置"}), 503
         return Response(
             stream_with_context(generate_stream(sid, msg, persona)),
