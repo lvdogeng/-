@@ -1,29 +1,28 @@
 """
-月白 AI Agent — 生产环境 WSGI 入口
-═══════════════════════════════════════════════════════════
-对原始 app.py 做最小化补丁，不修改原代码:
-  - 添加 /healthz 健康检查（给 Docker / Nginx upstream 用）
-  - 暴露 app 对象给 Gunicorn
+月白 AI Agent — Railway 入口（使用轻量版 API）
+选择这个入口是因为完整版的 BGE 模型下载会让 Railway 健康检查永远超时。
+Railway 健康检查会以 /healthz 触发，这里直接返回 200，无需重模型。
 
-用法: gunicorn wsgi:app
+启动方式: gunicorn wsgi:app
 """
 
 import os
 import sys
 import json
 
-# 确保当前目录在 path 中
+# 添加当前目录到 Python 路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# 初始化数据库 & 导入原始 app
-from app import app as _app, init_database
+# 导入轻量版应用（基于 OpenAI SDK，无本地模型加载）
+from railway_app import app
 
-# ---- 补丁: 健康检查 ----
-@_app.route("/healthz")
+# 健康检查路由 — Railway 必需的端点
+@app.route("/healthz")
 def healthz():
-    """Kubernetes / Docker / Nginx 健康检查端点"""
-    return json.dumps({"status": "ok", "service": "月白 AI Agent"}), 200, \
-           {"Content-Type": "application/json"}
+    return json.dumps({
+        "status": "ok",
+        "service": "月白 AI Agent",
+        "mode": "Railway lightweight edition"
+    }, ensure_ascii=False), 200, {"Content-Type": "application/json"}
 
-# ---- 暴露给 Gunicorn ----
-app = _app
+app = app  # Gunicorn 入口对象
