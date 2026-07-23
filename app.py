@@ -26,8 +26,8 @@ from langsmith.wrappers import wrap_openai
 API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 MODEL_NAME = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
-if not API_KEY:
-    raise RuntimeError("❌ 未设置 DEEPSEEK_API_KEY 环境变量！请在 Railway Variables 中配置。")
+# 注意：如果 API_KEY 为空，应用仍会启动，但首次对话时会报错
+# （不要在这里 raise，避免整个 app 启动失败导致健康检查永不通过）
 # 用 wrap_openai 包装 OpenAI 客户端 —— 所有 chat.completions 调用会自动生成 LangSmith Trace
 llm_client = wrap_openai(OpenAI(api_key=API_KEY, base_url=BASE_URL))
 
