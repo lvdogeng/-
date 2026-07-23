@@ -12,11 +12,8 @@ startCommand = "bash start.sh"
 numReplicas = 1
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
-healthcheckPath = "/healthz"
-# 首次启动要下载 BGE 模型（~95MB），放宽到 300 秒
-healthcheckTimeout = 300
-# 不阻塞 — 即使健康检查慢，应用先对外服务（健康检查会在后台继续）
-waitForSuccess = false
-
+# 完全关闭健康检查 — Railway 不再等待 /healthz，绑端口即对外服务
+# （BGE 模型首次懒加载，不阻塞 /healthz；首次聊天才下载）
+healthcheckPath = ""
 # 部署超时（秒），首次部署要下载依赖和模型，时间宽松一点
-deployTimeout = 900
+deployTimeout = 1800
