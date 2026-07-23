@@ -345,17 +345,24 @@ def kb_search():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json(force=True)
-    msg = data.get("message", "").strip()
-    sid = data.get("session_id", uuid.uuid4().hex)
-    persona = data.get("persona", "月白·智能")
-    if not msg:
-        return json.dumps({"error": "消息不能为空"}), 400
-    return Response(
-        stream_with_context(generate_stream(sid, msg, persona)),
-        mimetype="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
+    try:
+        data = request.get_json(force=True)
+        msg = data.get("message", "").strip()
+        sid = data.get("session_id", uuid.uuid4().hex)
+        persona = data.get("persona", "月白·智能")
+        if not msg:
+            return json.dumps({"error": "消息不能为空"}), 400
+        # 检查 API Key 是否配置
+        if not API_KEY:
+            return json.dumps({"error": "DEEPSEEK_API_KEY 环境变量未设置,请到 Railway Variables 配置"}), 503
+        return Response(
+            stream_with_context(generate_stream(sid, msg, persona)),
+            mimetype="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+    except Exception as e:
+        print(f"[/chat 错误] {e}")
+        return json.dumps({"error": f"聊天服务异常: {str(e)}"}), 500
 
 
 # ════════════════════════════════════════════════════════════
