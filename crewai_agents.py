@@ -18,11 +18,13 @@ from crewai import Agent, Task, Crew, Process, LLM
 from crewai.tools import tool
 
 # ════════════════════════════════════════════════════════════
-#  LLM 配置 — DeepSeek (OpenAI 兼容接口)
+#  LLM 配置 — 从环境变量读取
 # ════════════════════════════════════════════════════════════
-API_KEY = "sk-8105f2a68d4e4b76b6c3664a53119276"
-BASE_URL = "https://api.deepseek.com"
-MODEL_NAME = "deepseek-chat"
+API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+MODEL_NAME = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+if not API_KEY:
+    raise RuntimeError("❌ 未设置 DEEPSEEK_API_KEY 环境变量")
 
 deepseek_llm = LLM(
     model=f"openai/{MODEL_NAME}",

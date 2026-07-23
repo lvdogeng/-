@@ -61,7 +61,7 @@ git push -u origin main
 部署会失败（因为没 API Key），没事！点服务卡片 → **Variables** → 粘贴：
 
 ```
-DEEPSEEK_API_KEY=sk-8105f2a68d4e4b76b6c3664a53119276
+DEEPSEEK_API_KEY=你的DeepSeekAPIKey
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_BASE_URL=https://api.deepseek.com
 LANGSMITH_TRACING=false
