@@ -33,7 +33,7 @@ import urllib.request
 from datetime import datetime
 from collections import defaultdict
 
-from flask import Flask, request, Response, stream_with_context, send_from_directory
+from flask import Flask, request, Response, stream_with_context, send_from_directory, render_template
 from flask_cors import CORS
 from openai import OpenAI
 
@@ -63,7 +63,7 @@ _vector_store: list = []  # [{"id":..., "doc":..., "meta":..., "embedding":[...]
 # ════════════════════════════════════════════════════════════
 #  Flask 应用
 # ════════════════════════════════════════════════════════════
-app = Flask(__name__, static_folder="../static", template_folder="templates")
+app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app, resources={r"/*": {"origins": os.environ.get("ALLOW_ORIGIN", "*")}})
 
 
@@ -278,9 +278,9 @@ def save_msg(session_id: str, role: str, content: str):
 @app.route("/")
 def index():
     try:
-        return send_from_directory("../static", "index.html")
-    except Exception:
-        return json.dumps({"app": "月白 AI Agent", "status": "ok", "platform": "serverless"}), 200, {"Content-Type": "application/json"}
+        return render_template("index.html")
+    except Exception as e:
+        return json.dumps({"app": "月白 AI Agent", "status": "ok", "platform": "serverless", "debug": str(e)}), 200, {"Content-Type": "application/json"}
 
 
 @app.route("/healthz")
