@@ -421,7 +421,7 @@ def crew_endpoint():
 #  SSE 流式核心
 # ════════════════════════════════════════════════════════════
 def generate_stream(session_id: str, user_message: str, persona_key: str):
-    persona = PERSONAS.get(persona_key, PERSONAS["学小助·默认"])
+    persona = PERSONAS.get(persona_key, PERSONAS["月白·智能"])
     system_prompt = persona["prompt"]
     lower_msg = user_message.lower().strip()
 
